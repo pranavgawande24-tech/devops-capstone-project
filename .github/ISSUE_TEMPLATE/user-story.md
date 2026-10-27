@@ -1,24 +1,31 @@
+
 ---
 name: User Story
-about: Create a well-formatted user story
-title: ''
-labels: ''
-assignees: ''
+about: Create a user story for the DevOps Capstone project
+title: ""
+labels: ""
+assignees: ""
 ---
 
-**As a** [role]
+## User Story
 
-**I need** [function]
+**As a** [type of user],
+**I want** [a feature or capability],
+**So that** [the benefit or value].
 
-**So that** [benefit]
+## Acceptance Criteria
 
-### Details and Assumptions
-- [document what you know]
+- [ ] The required functionality is implemented.
+- [ ] The implementation handles valid input correctly.
+- [ ] Appropriate error handling is provided for invalid input.
+- [ ] Automated tests verify the expected behavior.
+- [ ] All relevant tests pass.
 
-### Acceptance Criteria
+## Tasks
 
-```gherkin
-Given [some context]
-When [certain action is taken]
-Then [the outcome of action is observed]
-```
+- [ ] Review the requirements.
+- [ ] Implement the required functionality.
+- [ ] Add or update unit tests.
+- [ ] Run linting and unit tests.
+- [ ] Update documentation if necessary.
+- [ ] Review and merge the completed change.
