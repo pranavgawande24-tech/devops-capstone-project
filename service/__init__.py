@@ -1,37 +1,66 @@
-"""
-Package: service
-Package for the application models and service routes
-This module creates and configures the Flask app and sets up the logging
-and SQL database
-"""
-import sys
-from flask import Flask
-from service import config
-from service.common import log_handlers
 
-# Create Flask application
-app = Flask(__name__)
-app.config.from_object(config)
+"""Flask application initialization for the Accounts REST API."""
 
-# Import the routes After the Flask app is created
-# pylint: disable=wrong-import-position, cyclic-import, wrong-import-order
-from service import routes, models  # noqa: F401 E402
+from flask import Flask, jsonify
+from flask_cors import CORS
+from flask_talisman import Talisman
 
-# pylint: disable=wrong-import-position
-from service.common import error_handlers, cli_commands  # noqa: F401 E402
 
-# Set up logging for production
-log_handlers.init_logging(app, "gunicorn.error")
+def create_app(test_config=None):
+    """Create and configure the Accounts Flask application."""
+    app = Flask(__name__)
 
-app.logger.info(70 * "*")
-app.logger.info("  A C C O U N T   S E R V I C E   R U N N I N G  ".center(70, "*"))
-app.logger.info(70 * "*")
+    app.config.update(
+        TESTING=False,
+        JSON_SORT_KEYS=True,
+    )
 
-try:
-    models.init_db(app)  # make our database tables
-except Exception as error:  # pylint: disable=broad-except
-    app.logger.critical("%s: Cannot continue", error)
-    # gunicorn requires exit code 4 to stop spawning workers when they die
-    sys.exit(4)
+    if test_config:
+        app.config.update(test_config)
 
-app.logger.info("Service initialized!")
+    CORS(
+        app,
+        resources={
+            r"/*": {
+                "origins": "*",
+                "methods": [
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "PATCH",
+                    "DELETE",
+                    "OPTIONS",
+                ],
+                "allow_headers": [
+                    "Content-Type",
+                    "Authorization",
+                ],
+            }
+        },
+    )
+
+    Talisman(
+        app,
+        force_https=False,
+        frame_options="DENY",
+        content_type_options=True,
+        referrer_policy="no-referrer",
+        strict_transport_security=False,
+        content_security_policy={
+            "default-src": ["'self'"],
+            "object-src": ["'none'"],
+            "frame-ancestors": ["'none'"],
+        },
+    )
+
+    @app.get("/health")
+    def health():
+        return jsonify({
+            "name": "Account REST API Service",
+            "version": "1.0",
+        }), 200
+
+    return app
+
+
+app = create_app()
